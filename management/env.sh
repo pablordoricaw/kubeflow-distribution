@@ -1,3 +1,3 @@
-export MGMT_PROJECT=<the project where you deploy your management cluster>
-export MGMT_NAME=<name of your management cluster>
-export LOCATION=<location of your management cluster>
+export MGMT_PROJECT=columbia-ms-courses-home
+export MGMT_NAME=kubeflow-chef
+export LOCATION=us-east4
