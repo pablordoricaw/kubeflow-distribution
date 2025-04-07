@@ -1,0 +1,920 @@
+#!/usr/bin/env bash
+set -CeE
+set -o pipefail
+
+SCRIPT_NAME="${0##*/}"; readonly SCRIPT_NAME
+_CI_ASM_PKG_LOCATION="${_CI_ASM_PKG_LOCATION:=}"; readonly _CI_ASM_PKG_LOCATION;
+_CI_ISTIOCTL_REL_PATH="${_CI_ISTIOCTL_REL_PATH:=}"; readonly _CI_ISTIOCTL_REL_PATH;
+_SLEEP_INTERVAL=5; readonly _SLEEP_INTERVAL;
+AKUBECTL="$(which kubectl || true)"; readonly AKUBECTL;
+AGCLOUD="$(which gcloud || true)"; readonly AGCLOUD;
+AOPENSSL="$(which openssl || true)"; readonly AOPENSSL;
+RELEASE="1.13.1-asm.1"; readonly RELEASE;
+CA_MIGRATION_CM_PREFIX="ca-migration-v1alpha1"
+CA_MIGRATION_CR_PREFIX="ca-migration"
+context_FILE_LOCATION="context_file";
+
+APATH=""
+
+MESHCA_CA_CERT="
+-----BEGIN CERTIFICATE-----
+MIIGlDCCBHygAwIBAgIQEW25APa7S9Sj/Nj6V6GxQTANBgkqhkiG9w0BAQsFADCB
+wTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDU1v
+dW50YWluIFZpZXcxEzARBgNVBAoTCkdvb2dsZSBMTEMxDjAMBgNVBAsTBUNsb3Vk
+MWAwXgYDVQQDDFdpc3Rpb192MV9jbG91ZF93b3JrbG9hZF9yb290LXNpZ25lci0w
+LTIwMTgtMDQtMjVUMTQ6MTE6MzMtMDc6MDAgSzoxLCAxOkg1MnZnd0VtM3RjOjA6
+MTgwIBcNMTgwNDI1MjExMTMzWhgPMjExODA0MjUyMjExMzNaMIHBMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmll
+dzETMBEGA1UEChMKR29vZ2xlIExMQzEOMAwGA1UECxMFQ2xvdWQxYDBeBgNVBAMM
+V2lzdGlvX3YxX2Nsb3VkX3dvcmtsb2FkX3Jvb3Qtc2lnbmVyLTAtMjAxOC0wNC0y
+NVQxNDoxMTozMy0wNzowMCBLOjEsIDE6SDUydmd3RW0zdGM6MDoxODCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBAK9dFtiHI0/r70k6WhbEuDgHDzl/O5MP
+symbiYF4cQ4ZDkMgXT2aVHyuB/MmdqteC2spuG5ojC6HCHhj+9JFF3KfU+Ej/j9A
+5gUz8d4VYD92LXh82irI2tOelbQ7PZALn5hRnpk0gnpzLe2kpa8lGy0TtB/v/303
+jZAl0e7iKKkX1Ooy9JzeBAYdNqu9uIhrl+naSXEGpuWxCY6uip+EcuKp9cR16kFz
+OKNn+sQ09d7KeFN9rLaZiodBzndVliq9FkWJwIeBp06Cq9tUMkmYvUFk3mt86nhZ
+rYviLI4tXSmZIGQNkvPQXU1ki3ukv/ZVdJrXV7w2k/EZmiF+9oxPwG4Z21GFfOKT
+WL/k9i7SCqIuT41pNK2mmKHsQI7Qlortz54s8Y2DpzcKc4EDfUIf62No7++HIMxu
+dPxbdQe11ImpDRcQIg9ZOqTboruLaGNBLO6rdcnqmgts3CLrlex1L9QGxQZCHRea
+riR1bWeQBNTAodYqSz6vpSI5hXUCkkXW7LFcPMqvRbRVclak8/Rp0LaHLQiDxkKp
+iQ1prfBO4IxYcHlEKPnxoBrk5WUZfX4j0Opbj8hkNVi+sB+/RvXruFLZoFAzcKu5
+KWKtPzUOb8P9VkEmNy7D3JXys5Gfi8NkVXn/khVVb1BTHHf9wC3nhJ50nuBkmPu7
+3bj1ABOajB+zAgMBAAGjgYMwgYAwDgYDVR0PAQH/BAQDAgEGMB0GA1UdJQQWMBQG
+CCsGAQUFBwMBBggrBgEFBQcDAjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQ/
+VsuyjgRDAEmcZjyJ77619Js9ijAfBgNVHSMEGDAWgBQ/VsuyjgRDAEmcZjyJ7761
+9Js9ijANBgkqhkiG9w0BAQsFAAOCAgEAUc5QJOqxmMJY0E2rcHEWQYRah1vat3wu
+IHtEZ3SkSumyj+y9eyIHb9XTTyc4SyGyX1n8Rary8oSgQV4cbyJTFXEEQOGLHB9/
+98EKThgJtfPsos2WKe/59S8yN05onpxcaL9y4S295Kv9kcSQxLm5UfjlqsKeHJZy
+mvxiYzmBox7LA1zqcLYZvslJNkJxKAk5JA66iyDSQqOK7jIixn8pi305dFGCZglU
+FStwWqY6Rc9rR8EycVhSx2AhrvT7OQTVdKLfoKA84D8JZJPB7hrxqKf7JJFs87Kj
+t7c/5bXPFJ2osmjoNYnbHjiq64bh20sSCd630qvhhePLwjjOlBPiFyK36o/hQN87
+1AEm1SCHy+aQcfJqF5KTgPnZQy5D+D/CGau+BfkO+WCGDVxRleYBJ4g2NbATolyg
+B2KWXrj07U/WaWqV2hERbkmxXFh6cUdlkX2MeoG4v6ZD2OKAPx5DpJCfp0TEq6Pz
+nP+Z1mLd/ZjGsOF8R2WGQJEuU8HRzvsr0wsX9UyLMqf5XViDK11V/W+dcIvjHCay
+BpX2se3dfex5jFht+JcQc+iwB8caSXkR6tGSiargEtSJODORacO9IB8b6W8Sm//J
+Wf/8zyiCcMm1i2yVVphwE1kczFwunAh0JB896VaXGVxXeKEAMQoXHjgDdCYp8/Et
+xjb8UkCmyjU=
+-----END CERTIFICATE-----
+"
+readonly MESHCA_CA_CERT
+
+starline() {
+  echo "*****************************"
+}
+
+info() {
+  echo "ca_migration_cli: ${1}" >&2
+}
+
+warn() {
+  info "[WARNING]: ${1}" >&2
+}
+
+error() {
+  info "[ERROR]: ${1}" >&2
+}
+
+fatal() {
+  error "${1}"
+  exit 2
+}
+
+fatal_with_usage() {
+  error "${1}"
+  usage >&2
+  exit 2
+}
+
+apath() {
+  "${APATH}" "${@}"
+}
+
+arg_required() {
+  if [[ ! "$2" || "${2:0:1}" = '-' ]]; then
+    fatal "ERROR: Option $1 requires an argument."
+  fi
+}
+
+strip_trailing_commas() {
+  # shellcheck disable=SC2001
+  echo "${1}" | sed 's/,*$//g'
+}
+
+kube() {
+  local KCF KCC CMD
+  KCF="$(context_get-option "KUBECONFIG")"
+  KCC="$(context_get-option "CONTEXT")"
+
+  CMD="${AKUBECTL}"
+  if [[ -n "${KCF}" ]]; then
+    CMD="${CMD} --kubeconfig ${KCF}"
+  fi
+  if [[ -n "${KCC}" ]]; then
+    CMD="${CMD} --context ${KCC}"
+  fi
+
+  # shellcheck disable=SC2086
+  retry 3 ${CMD} "${@}"
+}
+
+get_cm() {
+  local cm
+  local REVISION; REVISION="$(context_get-option "REVISION")"
+  if [[ -z "${REVISION}" ]] || [[ "${REVISION}" = default ]]; then
+    cm="istio"
+  else
+    cm="istio-${REVISION}"
+  fi
+  echo "${cm}"
+}
+
+check_empty_args() {
+  for arg in "$@"; do
+    arg_val="$(context_get-option "${arg}")" 
+    if [[ -z "${arg_val}" ]]; then
+      fatal "arg ${arg} missing"
+    fi
+  done
+}
+
+retry() {
+  local MAX_TRIES; MAX_TRIES="${1}";
+  local SLEEP_INTERVAL; SLEEP_INTERVAL=${_SLEEP_INTERVAL};
+  shift 1
+  for i in $(seq 0 "${MAX_TRIES}"); do
+    if [[ "${i}" -eq "${MAX_TRIES}" ]]; then
+      break
+    fi
+    { "${@}" && return 0; } || true
+    warn "Failed, retrying...($((i+1)) of ${MAX_TRIES})"
+    sleep ${SLEEP_INTERVAL}
+  done
+  local CMD="'$*'"
+  warn "Command $CMD failed."
+  false
+}
+
+download_istioctl_tarball() {
+  local OUTPUT_DIR; OUTPUT_DIR="$(context_get-option "OUTPUT_DIR")"
+  pushd ${OUTPUT_DIR}
+
+  case "$(uname)" in
+    Linux ) OS="linux-amd64";;
+    Darwin) OS="osx";;
+    *     ) fatal "$(uname) is not a supported OS.";;
+  esac
+
+  info "Downloading istioctl tool.."
+  local TARBALL; TARBALL="istio-${RELEASE}-${OS}.tar.gz"
+  if [[ -z "${_CI_ASM_PKG_LOCATION}" ]]; then
+    curl -L "https://storage.googleapis.com/gke-release/asm/${TARBALL}" \
+      | tar xz
+  else
+    local TOKEN; TOKEN="$(retry 2 gcloud auth print-access-token)"
+    curl -L "https://storage.googleapis.com/${_CI_ASM_PKG_LOCATION}/asm/${TARBALL}" \
+      --header @- <<EOF | tar xz
+Authorization: Bearer ${TOKEN}
+EOF
+  fi
+  local ISTIOCTL_REL_PATH; ISTIOCTL_REL_PATH="$(pwd)/istio-${RELEASE}/bin/istioctl";
+  context_set-option "ISTIOCTL_REL_PATH" "${ISTIOCTL_REL_PATH}"
+  popd
+}
+
+istioctl() {
+  local KCF KCC
+  KCF="$(context_get-option "KUBECONFIG")"
+  KCC="$(context_get-option "CONTEXT")"
+
+  if [[ -n "${KCF}" ]]; then
+    retry 3 "$(istioctl_path)" --kubeconfig "${KCF}" --context "${KCC}" "${@}"
+  else
+    retry 3 "$(istioctl_path)" "${@}"
+  fi
+}
+
+istioctl_path() {
+  local ISTIOCTL_REL_PATH; ISTIOCTL_REL_PATH="$(context_get-option "ISTIOCTL_REL_PATH")"
+  if [[ -n "${_CI_ISTIOCTL_REL_PATH}" && -f "${_CI_ISTIOCTL_REL_PATH}" ]]; then
+    echo "${_CI_ISTIOCTL_REL_PATH}"
+  else
+    echo "${ISTIOCTL_REL_PATH}"
+  fi
+}
+
+
+set_up_local_workspace() {
+  local OUTPUT_DIR; OUTPUT_DIR="$(context_get-option "OUTPUT_DIR")"
+
+  if [[ -z "${OUTPUT_DIR}" ]]; then
+    info "Setting up necessary working directory ......"
+    OUTPUT_DIR="$(mktemp -d)"
+    if [[ -z "${OUTPUT_DIR}" ]]; then
+      fatal "Encountered error when running mktemp -d!"
+    fi
+
+    info ""
+    info "$(starline)"
+    info "No output folder was specified with --output_dir|-D, so configuration and"
+    info "binaries will be stored in the following directory."
+    info "${OUTPUT_DIR}"
+    info "$(starline)"
+    info ""
+    sleep 2
+
+    context_set-option "OUTPUT_DIR" "${OUTPUT_DIR}"
+    if [[ ! -f "${OUTPUT_DIR}/${context_FILE_LOCATION}" ]]; then
+      mv ${context_FILE_LOCATION} ${OUTPUT_DIR} &> /dev/null
+    fi
+    context_FILE_LOCATION="${OUTPUT_DIR}/${context_FILE_LOCATION}"; readonly context_FILE_LOCATION
+  fi
+}
+
+
+context_init() {
+  local CONTEXT_JSON; CONTEXT_JSON=$(cat <<-EOF
+{
+  "flags": {
+    "KUBECONFIG": "${KUBECONFIG:-}",
+    "CONTEXT": "${CONTEXT:-}",
+    "OUTPUT_DIR": "${OUTPUT_DIR:-}",
+    "CA": "${CA:-}",
+    "CA_OLD": "${CA_OLD:-}",
+    "CA_NAME": "${CA_NAME:-}",
+    "CA_NAME_OLD": "${CA_NAME_OLD:-}",
+    "FLEET_ID": "${FLEET_ID:-}",
+    "REVISION": "${REVISION:-}",
+    "NAMESPACES": "${NAMESPACES:-}",
+    "CA_CERT": "${CA_CERT:-}",
+    "FORCE": "${FORCE:-}",
+    "ISTIOCTL_REL_PATH": "${ISTIOCTL_REL_PATH:-}"
+  }
+}
+EOF
+)
+
+  echo "${CONTEXT_JSON}" | jq -S '.' >| "${context_FILE_LOCATION}"
+
+}
+
+context_set-option() {
+  local OPTION; OPTION="${1}"
+  local VALUE; VALUE="${2}"
+  local TEMP_FILE; TEMP_FILE="$(mktemp)"
+
+  jq -S --arg OPTION "${OPTION}" --arg VALUE "${VALUE}" \
+  '.flags[$OPTION]=($VALUE | try tonumber catch $VALUE)' "${context_FILE_LOCATION}" >| "${TEMP_FILE}" \
+  && mv "${TEMP_FILE}" "${context_FILE_LOCATION}"
+}
+
+context_get-option() {
+  local OPTION; OPTION="${1}"
+
+  jq -r --arg OPTION "${OPTION}" '.flags[$OPTION]' "${context_FILE_LOCATION}"
+}
+
+## $1: ca-migration-state
+## $2: log/state
+update_migration_cm() {
+  local CURRENT_TIME; CURRENT_TIME="$(date +%s)"
+  local REVISION; REVISION="$(context_get-option "REVISION")"
+  local NAME; NAME="${CA_MIGRATION_CM_PREFIX}-${REVISION}"
+  local CA; CA="$(context_get-option "CA")"
+  local CA_POOL; CA_POOL="$(context_get-option "CA_NAME")"
+  local CA_OLD; CA_OLD="$(context_get-option "CA_OLD")"
+  local CA_POOL_OLD; CA_POOL_OLD="$(context_get-option "CA_NAME_OLD")"
+  local START_TIME;
+
+  if  [[ "${1}" = "INITIALIZE" ]]; then
+    START_TIME="${CURRENT_TIME}"
+  else
+    START_TIME="$(kube get cm/"${NAME}" -n istio-system -ojsonpath={.data.start_time})"
+    CA_OLD="$(kube get cm/"${NAME}" -n istio-system -ojsonpath={.data.old_ca} | cut -d":" -f 1)"
+    CA_POOL_OLD="$(kube get cm/"${NAME}" -n istio-system -ojsonpath={.data.old_ca} | cut -d":" -f 2-)"
+  fi
+
+  local CA_NAME; CA_NAME="${CA}:${CA_POOL}"
+  local CA_NAME_OLD; CA_NAME_OLD="${CA_OLD}:${CA_POOL_OLD}"
+
+    cat <<EOF | kube apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name:  ${NAME}
+  namespace: istio-system
+data:
+  start_time: "${START_TIME}"
+  revision: "${REVISION}"
+  state_update_time: "${CURRENT_TIME}"
+  state: "${1}"
+  target_ca: "${CA_NAME}"
+  old_ca: "${CA_NAME_OLD}"
+EOF
+
+}
+
+update_proxyConfig_cr() {
+  local REVISION; REVISION="$(context_get-option "REVISION")"
+
+  cat <<EOF | kube apply -f -
+apiVersion: networking.istio.io/v1beta1
+kind: ProxyConfig
+metadata:
+  name: "${CA_MIGRATION_CR_PREFIX}-${REVISION}"
+  namespace: istio-system
+  labels:
+    istio.io/rev: "${REVISION}"
+spec:
+  environmentVariables:
+    CA_ADDR: "$1"
+    CA_PROVIDER: "$2"
+EOF
+}
+
+parse_args() {
+
+  local OUTPUT_DIR
+  declare -A argMap
+  
+  while [[ $# != 0 ]]; do
+    case "${1}" in
+      --kubeconfig | --kc)
+        arg_required "${@}"
+        argMap["KUBECONFIG"]="${2}"
+        shift 2
+        ;;
+      --context | --ctx)
+        arg_required "${@}"
+        argMap["CONTEXT"]="${2}"
+        shift 2
+        ;;  
+      --ca)
+        arg_required "${@}"
+        local CA; CA="$(echo "${2}" | tr '[:upper:]' '[:lower:]')"
+        argMap["CA"]=${CA}
+        shift 2
+        ;;
+      --ca_pool | --ca-pool)
+        arg_required "${@}"
+        argMap["CA_NAME"]="${2}"
+        shift 2
+        ;;
+      --fleet_id | --fleet-id)
+        arg_required "${@}"
+        argMap["FLEET_ID"]="$2"
+        shift 2
+        ;;
+      --revision)
+        arg_required "${@}"
+        argMap["REVISION"]="$2"
+        shift 2
+        ;;
+      --namespaces)
+        arg_required "${@}"
+        argMap["NAMESPACES"]="$2"
+        shift 2
+        ;;
+      --ca_cert | --ca-cert)
+        arg_required "${@}"
+        argMap["CA_CERT"]="$2"
+        shift 2
+        ;;
+      --ca_old | --ca-old)
+        arg_required "${@}"
+        local CA_OLD; CA_OLD="$(echo "${2}" | tr '[:upper:]' '[:lower:]')"
+        argMap["CA_OLD"]="${CA_OLD}"
+        shift 2
+        ;;
+      --ca_pool_old | --ca-pool-old )
+        arg_required "${@}"
+        argMap["CA_NAME_OLD"]="$2"
+        shift 2
+        ;;         
+      --force | -f)
+        argMap["FORCE"]="true"
+        shift 1
+        ;;
+      -D | --output_dir | --output-dir)
+        arg_required "${@}"
+        OUTPUT_DIR="$(apath -f "${2}")"
+        if [[ ! -a "${OUTPUT_DIR}" ]]; then
+          fatal "directory ${OUTPUT_DIR} does not exist"
+        elif [[ ! -d "${OUTPUT_DIR}" ]]; then
+          fatal "${OUTPUT_DIR} exists and is not a directory, please specify another directory."
+        fi
+        argMap["OUTPUT_DIR"]="${OUTPUT_DIR}"
+        shift 2
+        ;;
+      *)
+        fatal_with_usage "Unknown option ${1}"
+        ;;
+    esac
+  done
+
+  if [[ -n "${OUTPUT_DIR}" ]]; then
+    if [[ ! -f "${OUTPUT_DIR}/${context_FILE_LOCATION}" ]]; then
+      mv ${context_FILE_LOCATION} ${OUTPUT_DIR} &> /dev/null
+    fi
+    context_FILE_LOCATION="${OUTPUT_DIR}/${context_FILE_LOCATION}"
+  fi
+
+  for argName in ${!argMap[@]}; do
+    context_set-option "$argName" "${argMap[$argName]}"
+  done
+}
+
+check-prerequisite_subcommand() {
+  local NOTFOUND; NOTFOUND="";
+  local EXITCODE; EXITCODE=0;
+
+  info "Checking installation tool dependencies..."
+
+  while read -r dependency; do
+    EXITCODE=0
+    hash "${dependency}" 2>/dev/null || EXITCODE=$?
+    if [[ "${EXITCODE}" -ne 0 ]]; then
+      NOTFOUND="${dependency},${NOTFOUND}"
+    fi
+  done <<EOF
+awk
+$AGCLOUD
+grep
+jq
+yq
+$AKUBECTL
+sed
+tr
+head
+$AOPENSSL
+EOF
+
+  while read -r FLAG; do
+    if [[ -z "${!FLAG}" ]]; then
+      NOTFOUND="${FLAG},${NOTFOUND}"
+    fi
+  done <<EOF
+AKUBECTL
+AGCLOUD
+AOPENSSL
+EOF
+
+  if [[ "${#NOTFOUND}" -gt 1 ]]; then
+    NOTFOUND="$(strip_trailing_commas "${NOTFOUND}")"
+    for dep in $(echo "${NOTFOUND}" | tr ' ' '\n'); do
+      warn "Dependency not found: ${dep}"
+    done
+    fatal "One or more dependencies were not found. Please install them and retry."
+  fi
+
+  local OS
+  # shellcheck disable=SC2064
+  trap "$(shopt -p nocasematch)" RETURN
+  shopt -s nocasematch
+  if [[ "$(uname -m)" != "x86_64" ]]; then
+    fatal "Installation is only supported on x86_64."
+  fi 
+  info "All Dependencies satisfied!..."
+}
+
+initialize_istiod_ca() {
+  fatal "Not implemented yet"
+}
+
+initialize_mesh_ca() {
+  :
+}
+
+validate_private_ca() {
+  
+  local CA_NAME; CA_NAME="$(context_get-option "CA_NAME")"
+  
+  local CA_POOL_TEMPLATE; CA_POOL_TEMPLATE="projects/project_name/locations/ca_region/caPools/ca_pool"
+  local CT_TEMPLATE; CT_TEMPLATE="projects/project_name/locations/ca_region/certificateTemplates/cert_template"
+  local CA_NAME_TEMPLATE; CA_NAME_TEMPLATE="${CA_POOL_TEMPLATE}:${CT_TEMPLATE}"
+
+  local CA_POOL_REGEX; CA_POOL_REGEX="projects/[a-zA-Z0-9_-]+/locations/[a-zA-Z0-9_-]+/caPools/[a-zA-Z0-9_-]+"
+  local CT_REGEX; CT_REGEX="projects/[a-zA-Z0-9_-]+/locations/[a-zA-Z0-9_-]+/certificateTemplates/[a-zA-Z0-9_-]+"
+  local CA_NAME_REGEX; CA_NAME_REGEX="${CA_POOL_REGEX}:${CT_REGEX}"
+
+  if [[ -z ${CA_NAME} ]]; then
+    fatal "A ca-pool must be provided for integration with Google Certificate Authority Service."
+  # check if CA_NAME is ca_pool:cert_template format
+  elif [[ "${CA_NAME}" == *":"* ]]; then
+    if ! [[ "${CA_NAME}" =~ ^${CA_NAME_REGEX}$ ]]; then
+      fatal "Malformed ca with certificate template. ca-pool must be of the form ${CA_NAME_TEMPLATE}."
+    fi
+  # when CA_NAME is ca_pool format
+  elif ! [[ "${CA_NAME}" =~ ^${CA_POOL_REGEX}$ ]]; then
+    fatal "Malformed ca-pool. ca-pool must be of the form ${CA_POOL_TEMPLATE}."
+  fi
+}
+
+initialize_gcp_cas() {
+
+  validate_private_ca
+
+  local CA_NAME; CA_NAME="$(context_get-option "CA_NAME")"
+  local CA_POOL_URI; CA_POOL_URI=$(echo "${CA_NAME}" | cut -f1 -d:)
+  local FLEET_ID; FLEET_ID="$(context_get-option "FLEET_ID")"
+  local WORKLOAD_IDENTITY; WORKLOAD_IDENTITY="${FLEET_ID}.svc.id.goog:/allAuthenticatedUsers/"
+  local CA_LOCATION; CA_LOCATION=$(echo "${CA_POOL_URI}" | cut -f4 -d/)
+  local CA_POOL; CA_POOL=$(echo "${CA_POOL_URI}" | cut -f6 -d/)
+  local PROJECT; PROJECT=$(echo "${CA_POOL_URI}" | cut -f2 -d/)
+
+  retry 3 gcloud privateca pools add-iam-policy-binding "${CA_POOL}" \
+    --project "${PROJECT}" \
+    --location "${CA_LOCATION}" \
+    --member "group:${WORKLOAD_IDENTITY}" \
+    --role "roles/privateca.workloadCertificateRequester"
+
+  retry 3 gcloud privateca pools add-iam-policy-binding "${CA_POOL}" \
+    --project "${PROJECT}" \
+    --location "${CA_LOCATION}" \
+    --member "group:${WORKLOAD_IDENTITY}" \
+    --role "roles/privateca.auditor"
+
+  if [[ "${CA_NAME}" == *":"* ]]; then
+    local CERT_TEMPLATE; CERT_TEMPLATE=$(echo "${CA_NAME}" | cut -f2 -d:)
+    retry 3 gcloud privateca templates add-iam-policy-binding "${CERT_TEMPLATE}" \
+      --member "group:${WORKLOAD_IDENTITY}" \
+      --role "roles/privateca.templateUser"
+  fi
+}
+
+setup_subcommand() {
+
+  context_init
+
+  parse_args "${@}"
+
+  set_up_local_workspace
+
+  download_istioctl_tarball
+}
+
+# 1. Initialize CA per different CA types if needed
+# 2. Grant IAM permissions if needed
+# 3. Fetch CA trust anchors
+initialize_subcommand() {
+  
+  parse_args "${@}"
+
+  check_empty_args "CA" "CA_OLD" "FLEET_ID" "REVISION"
+
+  local CA; CA="$(context_get-option "CA")"
+
+  case "${CA}" in
+    mesh_ca) initialize_mesh_ca;;
+    gcp_cas) initialize_gcp_cas;;
+    citadel) initialize_istiod_ca;;
+  esac
+   # infer_older_ca_proxyconfig
+   # working directory should be OUTPUT_DIR before this command
+   update_migration_cm "INITIALIZE"
+}
+
+download-trust-anchor_subcommand() {
+  parse_args "${@}"
+  check_empty_args "CA" "CA_CERT"
+  local CA; CA="$(context_get-option "CA")"
+  local CA_CERT; CA_CERT="$(context_get-option "CA_CERT")"
+
+  case "${CA}" in
+    gcp_cas) fatal "download-trust-anchor not implemented for gcp_cas CA";;
+    citadel) fatal "download-trust-anchor not implemented for citadel CA";;
+    mesh_ca) echo "${MESHCA_CA_CERT}" > ${CA_CERT};;
+  esac
+}
+
+add-trust-anchor_subcommand() {
+  parse_args "${@}"
+  check_empty_args "CA_CERT" "FLEET_ID" "REVISION"
+  backup_resources
+  add_trust_anchor
+  update_migration_cm "TRUSTANCHOR_INJECTED"
+}
+
+backup_resources() {
+  local REV_NAME; REV_NAME="$(get_cm)"
+  local OUTPUT_DIR; OUTPUT_DIR="$(context_get-option "OUTPUT_DIR")"
+
+  rm ${OUTPUT_DIR}/"backup-${REV_NAME}" &> /dev/null || true
+  kube get cm/${REV_NAME} -n istio-system -oyaml > ${OUTPUT_DIR}/"backup-${REV_NAME}"
+}
+
+add_trust_anchor() {
+  local REV_NAME; REV_NAME="$(get_cm)"
+  local CA_CERT; CA_CERT="$(context_get-option "CA_CERT")"
+
+  info "Adding new CA trust anchor to ${REV_NAME} configmap"
+  local CA_CERT_CONTENT; CA_CERT_CONTENT=$(cat "$CA_CERT")
+  local NEW_MESH_CONFIG; NEW_MESH_CONFIG=$(kube -n istio-system get configmaps ${REV_NAME} -o jsonpath='{.data.mesh}' | yq eval -o=json | jq '.caCertificates[.caCertificates| length] |= . + {"pem": "'"$CA_CERT_CONTENT"'"}' | yq eval -P)
+  kube -n istio-system get configmaps ${REV_NAME} -o json | jq --arg NEW_MESH_CONFIG "$NEW_MESH_CONFIG" '.data.mesh = $NEW_MESH_CONFIG' | yq eval -P | kube apply -f - || warn "failed to patch the configmap ${REV_NAME}"
+}
+
+check-trust-anchor_subcommand() {
+  parse_args "${@}"
+  check_empty_args "CA_CERT" "FLEET_ID"
+  local CA_CERT; CA_CERT="$(context_get-option "CA_CERT")"
+  local FLEET_ID; FLEET_ID="$(context_get-option "FLEET_ID")"
+  local NAMESPACES; NAMESPACES="$(context_get-option "NAMESPACES")"
+  if [[ -z "${NAMESPACES}" ]]; then
+    ns="$(kube get ns -ojsonpath={.items[*].metadata.name} | sed "s/ /\n/g" | grep -Ev "istio-system|kube-system" )"
+    NAMESPACES="$(echo $ns | sed "s/ /,/g" )"
+  fi
+  IFS=',' read -ra NAMESPACE_LIST <<< "$NAMESPACES"
+  for ns in "${NAMESPACE_LIST[@]}"; do
+    echo "Check the CA cert in namespace ${ns}"
+    check_in_namespace "${ns}" "cert" "ROOTCA" "${CA_CERT}"
+  done
+}
+
+# $1: namespace
+# $2: cert/other subcommand
+# $3: roots/certs
+# $4: caCert filename
+check_in_namespace() {
+  local pods
+  local containers
+
+  pods=$(kube get pod -o jsonpath={.items..metadata.name} -n "$1")
+	for pod in ${pods}
+	do
+    containers="$(kube get pod "${pod}" -n "$1" -o jsonpath=={.spec.containers.*.name})"
+    if [[ "${containers}" == *"istio-proxy"* ]]; then
+      if [[ "$2" = "cert" ]]; then
+        check_cert_in_pod "${pod}" "$1" "$3" "$4"
+      fi
+    fi
+	done
+}
+
+declare -A rootmap
+
+add_to_rootmap() {
+  local output
+  local roots
+
+  output=$(istioctl pc secret "$1" -n "$2" -o json)
+
+  if [ "$(echo "${output}" | jq '.dynamicActiveSecrets[0].name')" = "\"ROOTCA\"" ]; then
+    roots=$(echo "${output}" | jq '.dynamicActiveSecrets[0].secret.validationContext.trustedCa.inlineBytes')
+  else
+    roots=$(echo "${output}" | jq '.dynamicActiveSecrets[1].secret.validationContext.trustedCa.inlineBytes')
+  fi
+  if [ -z "${roots}" ]; then
+    echo "Cannot find roots for $1.$2"
+    exit 1
+  fi
+  local tmp_file; tmp_file="$(mktemp).pem"
+  echo "${roots}" | sed 's/\"//g' | base64 -d > ${tmp_file}
+  # Search for trustAnchor in workload trustBundle
+  rootmap[$3]=true
+
+  while read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == *"-BEGIN CERTIFICATE-"* ]]; then
+        cert=$line
+    else
+        cert="$cert"$'\n'"$line"
+        if [[ "$line" == *"-END CERTIFICATE-"* ]]; then
+            if [[ "${cert}" != "$(grep -f ${tmp_file} <(echo "${cert}"))" ]]; then
+              rootmap[$3]=false
+            fi
+        fi
+    fi
+  done < "${4}"
+
+}
+
+extract_root() {
+  local cert
+  while read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == *"-BEGIN CERTIFICATE-"* ]]; then
+      cert=$line
+    else
+      cert="$cert"$'\n'"$line"
+    fi
+  done < "${1}"
+  echo "${cert}"
+}
+
+# $1: pod
+# $2: namespace
+# $3: ROOTCA/default
+# $4: caCert file
+check_cert_in_pod() {
+  local POD; POD="$1"
+  local NS; NS="$2"
+  local TARGET; TARGET="$3"
+  local CA_CERT; CA_CERT="$4"
+  local ERR; ERR=0
+  local OUTPUT_DIR; OUTPUT_DIR="$(context_get-option "OUTPUT_DIR")"
+
+  if [ "$TARGET" = "ROOTCA" ]; then
+    # Example format:
+    # RESOURCE NAME   TYPE   STATUS   VALID CERT  SERIAL NUMBER        NOT AFTER            NOT BEFORE
+    # ROOTCA          CA     ACTIVE   true        16289816804573236346 2117-12-31T19:15:51Z 2018-01-24T19:15:51Z
+    # We use the serial number for the comparison.
+    local SN
+    SN=$(istioctl pc secret "${POD}" -n "${NS}" | grep "ROOTCA" | awk '{print $5}')
+    if [[ -z ${SN} ]]; then
+      echo " - [WARNING] ${POD}.${NS} cannot find certificate information"
+      return
+    fi
+    if [[ -z ${rootmap[${SN}]} ]]; then
+      add_to_rootmap "${POD}" "${NS}" "${SN}" "${CA_CERT}"
+    fi
+    if ! ${rootmap[${SN}]}; then
+      echo "${POD}.${NS} does not trust ${CA_CERT}"
+      ERR=1
+    else
+      echo "${POD}.${NS} trusts ${CA_CERT}"
+    fi
+  elif [ "$TARGET" = "default" ]; then
+    local OUTPUT
+    local CERT_CHAIN
+    local ROOT_CERT_FILE; ROOT_CERT_FILE="${OUTPUT_DIR}/${POD}-${NS}-${TARGET}.pem"
+
+    OUTPUT=$(istioctl pc secret "${POD}" -n "${NS}" -o json)
+    if [ "$(echo "${OUTPUT}" | jq '.dynamicActiveSecrets[0].name')" = "\"default\"" ]; then
+      CERT_CHAIN=$(echo "${OUTPUT}" | jq '.dynamicActiveSecrets[0].secret.tlsCertificate.certificateChain.inlineBytes')
+    else
+      CERT_CHAIN=$(echo "${OUTPUT}" | jq '.dynamicActiveSecrets[1].secret.tlsCertificate.certificateChain.inlineBytes')
+    fi
+    if [ -z "${CERT_CHAIN}" ]; then
+      echo "Cannot find certificate chain for ${POD}.${NS}"
+      exit 1
+    fi
+    if [ -f "${ROOT_CERT_FILE}" ]; then
+       rm ${ROOT_CERT_FILE}
+    fi
+    echo "${CERT_CHAIN}" | sed 's/\"//g' | base64 -d > ${ROOT_CERT_FILE}
+    cert=$(extract_root ${ROOT_CERT_FILE})
+
+    if [[ "${cert}" != "$(grep -f ${CA_CERT} <(echo "${cert}"))" ]]; then
+      echo "${POD}.${NS} is not signed by ${CA_CERT}"
+      ERR=1
+    else
+      echo "${POD}.${NS} is signed by ${CA_CERT}"
+    fi
+  fi
+
+  if [[ ${ERR} -eq 1 ]]; then
+    exit 2
+  fi
+}
+
+migrate-ca_subcommand() {
+  parse_args "${@}"
+  check_empty_args "CA" "FLEET_ID" "REVISION"
+
+  local CA_NAME; CA_NAME="$(context_get-option "CA_NAME")"
+  local CA; CA="$(context_get-option "CA")"
+  local CA_PROVIDER;
+  local CA_ADDR;
+
+  case "${CA}" in
+    mesh_ca) CA_PROVIDER="GoogleCA"; CA_ADDR="";;
+    gcp_cas) CA_PROVIDER="GoogleCAS"; CA_ADDR="${CA_NAME}";;
+    citadel) fatal "Not implemented";;
+  esac
+
+  update_proxyConfig_cr "${CA_ADDR}" "${CA_PROVIDER}"
+  update_migration_cm "CA_MIGRATE"
+}
+
+verify-ca_subcommand() {
+    parse_args "${@}"
+    check_empty_args "CA_CERT" "FLEET_ID"
+    local CA_CERT; CA_CERT="$(context_get-option "CA_CERT")"
+    local FLEET_ID; FLEET_ID="$(context_get-option "FLEET_ID")"
+    local NAMESPACES; NAMESPACES="$(context_get-option "NAMESPACES")"
+    if [[ -z "${NAMESPACES}" ]]; then
+      ns="$(kube get ns -ojsonpath={.items[*].metadata.name} | sed "s/ /\n/g" | grep -Ev "istio-system|kube-system" )"
+      NAMESPACES="$(echo $ns | sed "s/ /,/g" )"
+    fi
+    IFS=',' read -ra NAMESPACE_LIST <<< "$NAMESPACES"
+    for ns in "${NAMESPACE_LIST[@]}"; do
+      echo "Check the CA configuration in namespace ${ns}"
+      check_in_namespace "${ns}" "cert" "default" "${CA_CERT}"
+    done
+}
+
+complete_subcommand() {
+  parse_args "${@}"
+  check_empty_args "REVISION"
+  update_migration_cm "COMPLETE"
+}
+
+rollback_subcommand() {
+  parse_args "${@}"
+  local REVISION; REVISION="$(context_get-option "REVISION")"
+  # Remove CA config
+  kube delete ProxyConfig/${CA_MIGRATION_CR_PREFIX}-${REVISION} -n istio-system
+
+  # update the final state
+  update_migration_cm "ROLLBACK"
+}
+
+helper_subcommand() {
+  warn "${1} is not a supported subcommand"
+  usage
+}
+
+main() {
+  # BSD-style readlink apparently doesn't have the same -f toggle on readlink
+  case "$(uname)" in
+    Linux ) APATH="readlink";;
+    Darwin) APATH="stat";;
+    *);;
+  esac
+  readonly APATH
+
+  if [[ "${*}" = '' ]]; then
+    usage >&2
+    exit 2
+  fi
+
+  case "${1}" in
+    check-prerequisites)
+      shift 1
+      check-prerequisite_subcommand "${@}"
+      ;;
+    setup)
+      shift 1
+      setup_subcommand "${@}"
+      ;;
+    initialize)
+      shift 1
+      initialize_subcommand "${@}"
+      ;;
+    download-trust-anchor)
+      shift 1
+      download-trust-anchor_subcommand "${@}"
+      ;;
+    add-trust-anchor)
+      shift 1
+      add-trust-anchor_subcommand "${@}"
+      ;;
+    check-trust-anchor)
+      shift 1
+      check-trust-anchor_subcommand "${@}"
+      ;;
+    migrate-ca)
+      shift 1
+      migrate-ca_subcommand "${@}"
+      ;;
+    verify-ca)
+      shift 1
+      verify-ca_subcommand "${@}"
+      ;;
+    rollback)
+      shift 1
+      rollback_subcommand "${@}"
+      ;;
+    *)
+    helper_subcommand "${@}"
+  esac
+}
+
+usage() {
+  cat << EOF
+usage: ${SCRIPT_NAME} [SUBCOMMAND] [OPTION]...
+Migrate ASM CA with minimial mesh downtime
+SUBCOMMANDS:
+  check-prerequisites                           Check prerequisites before using tool
+  setup                                         Sets up the working directory and downloads necessary pre-requisites
+  initialize                                    Initialize newer CA and migration state in cluster
+  download-trust-anchor                         Download trustAnchor into a file. Only intended for CA=mesh_ca
+  add-trust-anchor                              Add newer CA's trustAnchors to all mesh workloads in cluster
+  check-trust-anchor                            Check all cluster workloads have newer CA's trustAnchor in trustbundle
+  migrate-ca                                    Migrate ASM CA to newer CA
+  verify-ca                                     Check all cluster workloads have certificates signed by newer CA
+  rollback                                      Rollback CA migration to older CA
+OPTIONS:
+  --kubeconfig           <KUBECONFIG_FILE>      (Optional) Path to the kubeconfig file to use for CLI requests.
+  --ctx|--context        <CONTEXT>              (Optional) The name of the kubeconfig context to use.
+  --fleet_id             <FLEET ID>             The Fleet host project ID. All clusters need to be registered to a fleet.
+  --ca                   <CA>                   Newer ASM CA type. Allowed values for are {citadel|mesh_ca|gcp_cas}.
+  --ca_old|--ca-old      <CA_OLD>               Older ASM CA type. Allowed values for are {citadel|mesh_ca|gcp_cas}.              
+  --ca_pool|--ca-pool    <CA POOL>              Required only if --ca option is gcp_cas.
+                                                Name of the newer ca pool in the GCP CAS service used to
+                                                sign certificates in the format
+                                                'projects/project_name/locations/ \
+                                                ca_region/caPools/ca_pool'. If certificate template
+                                                needs to be specified, the format is 'projects/ \
+                                                project_name/locations/ca_region/caPools/ \
+                                                ca_pool:projects/project_name/locations/ca_region/ \
+                                                certificateTemplates/cert_template'.
+  --ca_pool_old|--ca-pool-old <CA_OLD_NAME>     Required only if --ca_old option is gcp_cas.
+                                                Similar to --ca_name
+  --ca_cert              <CA CERT FILE>         Absolute to CA cert file of newer CA
+  -D|--output_dir        <DIR PATH>             The directory where script will
+                                                download and backup all migration artifacts
+  --revision             <FILE NAME>            ASM revision/channel where CA migration is being performed
+  --namespaces           <Namespaces>           Comma seperated list of namespaces where ASM workloads are deployed
+FLAGS:
+EOF
+}
+
+main "${@}"

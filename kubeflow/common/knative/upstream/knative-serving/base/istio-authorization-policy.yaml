@@ -1,0 +1,88 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata: # kpt-merge: knative-serving/activator-service
+  name: activator-service
+  namespace: knative-serving
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'security.istio.io|AuthorizationPolicy|knative-serving|activator-service'
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: activator
+  rules:
+  - {}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata: # kpt-merge: knative-serving/autoscaler
+  name: autoscaler
+  namespace: knative-serving
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'security.istio.io|AuthorizationPolicy|knative-serving|autoscaler'
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: autoscaler
+  rules:
+  - {}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata: # kpt-merge: knative-serving/controller
+  name: controller
+  namespace: knative-serving
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'security.istio.io|AuthorizationPolicy|knative-serving|controller'
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: controller
+  rules:
+  - {}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata: # kpt-merge: knative-serving/webhook
+  name: webhook
+  namespace: knative-serving
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'security.istio.io|AuthorizationPolicy|knative-serving|webhook'
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      role: webhook
+  rules:
+  - {}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata: # kpt-merge: knative-serving/istio-webhook
+  name: istio-webhook
+  namespace: knative-serving
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'security.istio.io|AuthorizationPolicy|knative-serving|istio-webhook'
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      app: net-istio-webhook
+  rules:
+  - {}
+---
+# DestinationRule for mTLS
+apiVersion: "networking.istio.io/v1alpha3"
+kind: DestinationRule
+metadata: # kpt-merge: knative-serving/knative
+  name: knative
+  namespace: knative-serving
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'networking.istio.io|DestinationRule|knative-serving|knative'
+spec:
+  host: "*.knative-serving.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

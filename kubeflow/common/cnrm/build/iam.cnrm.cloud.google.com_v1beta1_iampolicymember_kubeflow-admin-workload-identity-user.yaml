@@ -1,0 +1,14 @@
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
+metadata:
+  labels:
+    kf-name: kubeflow
+  name: kubeflow-admin-workload-identity-user
+  namespace: columbia-ms-courses-home
+spec:
+  member: serviceAccount:columbia-ms-courses-home.svc.id.goog[kubeflow/profiles-controller-service-account]
+  resourceRef:
+    apiVersion: iam.cnrm.cloud.google.com/v1beta1
+    kind: IAMServiceAccount
+    name: kubeflow-admin
+  role: roles/iam.workloadIdentityUser

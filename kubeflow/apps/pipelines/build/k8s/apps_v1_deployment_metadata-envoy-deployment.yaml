@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apps|Deployment|default|metadata-envoy-deployment
+  labels:
+    component: metadata-envoy
+  name: metadata-envoy-deployment
+  namespace: kubeflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: metadata-envoy
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        component: metadata-envoy
+    spec:
+      containers:
+      - image: gcr.io/ml-pipeline/metadata-envoy:2.0.3
+        name: container
+        ports:
+        - containerPort: 9090
+          name: md-envoy
+        - containerPort: 9901
+          name: envoy-admin

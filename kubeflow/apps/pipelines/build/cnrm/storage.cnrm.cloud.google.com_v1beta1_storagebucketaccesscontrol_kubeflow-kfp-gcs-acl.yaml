@@ -1,0 +1,13 @@
+apiVersion: storage.cnrm.cloud.google.com/v1beta1
+kind: StorageBucketAccessControl
+metadata:
+  labels:
+    app: kubeflow-pipelines
+    kf-name: kubeflow
+  name: kubeflow-kfp-gcs-acl
+  namespace: columbia-ms-courses-home
+spec:
+  bucketRef:
+    name: columbia-ms-courses-home-kfp
+  entity: user-kubeflow-user@columbia-ms-courses-home.iam.gserviceaccount.com
+  role: OWNER

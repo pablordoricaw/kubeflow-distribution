@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata: # kpt-merge: /katib-webhook-cert
+  name: katib-webhook-cert
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'cert-manager.io|Certificate|default|katib-webhook-cert'
+spec:
+  isCA: true
+  commonName: $(KATIB_SERVICE_NAME).$(KATIB_NAMESPACE).svc
+  dnsNames:
+    - $(KATIB_SERVICE_NAME).$(KATIB_NAMESPACE).svc
+    - $(KATIB_SERVICE_NAME).$(KATIB_NAMESPACE).svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: katib-selfsigned-issuer
+  secretName: katib-webhook-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata: # kpt-merge: /katib-selfsigned-issuer
+  name: katib-selfsigned-issuer
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'cert-manager.io|Issuer|default|katib-selfsigned-issuer'
+spec:
+  selfSigned: {}

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|default|profiles-kfam'
+  labels:
+    kustomize.component: profiles
+  name: profiles-kfam
+  namespace: kubeflow
+spec:
+  ports:
+  - port: 8081
+  selector:
+    kustomize.component: profiles

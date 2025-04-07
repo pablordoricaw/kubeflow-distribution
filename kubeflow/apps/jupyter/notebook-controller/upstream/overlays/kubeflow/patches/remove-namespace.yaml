@@ -1,0 +1,7 @@
+$patch: delete
+apiVersion: v1
+kind: Namespace
+metadata: # kpt-merge: /notebook-controller-system
+  name: notebook-controller-system
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Namespace|default|notebook-controller-system'

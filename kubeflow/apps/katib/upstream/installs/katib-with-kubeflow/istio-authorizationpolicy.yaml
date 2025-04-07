@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata: # kpt-merge: kubeflow/katib-ui
+  name: katib-ui
+  namespace: kubeflow
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'security.istio.io|AuthorizationPolicy|kubeflow|katib-ui'
+spec:
+  action: ALLOW
+  selector:
+    matchLabels:
+      katib.kubeflow.org/component: ui
+  rules:
+    - from:
+        - source:
+            principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]

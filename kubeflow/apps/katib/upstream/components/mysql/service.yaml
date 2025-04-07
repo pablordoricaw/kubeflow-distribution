@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata: # kpt-merge: kubeflow/katib-mysql
+  name: katib-mysql
+  namespace: kubeflow
+  labels:
+    katib.kubeflow.org/component: mysql
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|kubeflow|katib-mysql'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      protocol: TCP
+      name: dbapi
+  selector:
+    katib.kubeflow.org/component: mysql

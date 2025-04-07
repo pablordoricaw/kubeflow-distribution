@@ -1,0 +1,9 @@
+apiVersion: kubeflow.org/v1beta1
+kind: Profile
+metadata: # kpt-merge: /profile-sample
+  name: profile-sample
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'kubeflow.org|Profile|default|profile-sample'
+spec:
+
+# TODO(user): Add fields here

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata: # kpt-merge: /centraldashboard
+  labels:
+    app: centraldashboard
+  name: centraldashboard
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|default|centraldashboard'
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8082
+  selector:
+    app: centraldashboard
+  sessionAffinity: None
+  type: ClusterIP

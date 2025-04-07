@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: networking.istio.io|DestinationRule|default|ml-pipeline-minio
+  name: ml-pipeline-minio
+  namespace: kubeflow
+spec:
+  host: minio-service.kubeflow.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

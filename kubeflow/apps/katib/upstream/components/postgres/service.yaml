@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata: # kpt-merge: kubeflow/katib-postgres
+  name: katib-postgres
+  namespace: kubeflow
+  labels:
+    katib.kubeflow.org/component: postgres
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|kubeflow|katib-postgres'
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      protocol: TCP
+      name: dbapi
+  selector:
+    katib.kubeflow.org/component: postgres

@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  userid-header: x-goog-authenticated-user-email
+  userid-prefix: 'accounts.google.com:'
+kind: ConfigMap
+metadata:
+  name: kubeflow-config
+  namespace: kubeflow

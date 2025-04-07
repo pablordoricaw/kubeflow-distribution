@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: rbac.authorization.k8s.io|ClusterRoleBinding|default|ml-pipeline
+  labels:
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+  name: ml-pipeline
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ml-pipeline
+subjects:
+- kind: ServiceAccount
+  name: ml-pipeline
+  namespace: kubeflow

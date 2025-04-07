@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kubeflow-pipelines-cloudsql-proxy
   annotations:
-    iam.gke.io/gcp-service-account: KUBEFLOW-NAME-sql@PROJECT.iam.gserviceaccount.com # kpt-set: ${name}-sql@${gcloud.core.project}.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: kubeflow-sql@columbia-ms-courses-home.iam.gserviceaccount.com # kpt-set: ${name}-sql@${gcloud.core.project}.iam.gserviceaccount.com

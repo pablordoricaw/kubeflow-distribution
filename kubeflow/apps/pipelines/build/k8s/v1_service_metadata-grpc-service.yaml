@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|default|metadata-grpc-service'
+  labels:
+    app: metadata
+  name: metadata-grpc-service
+  namespace: kubeflow
+spec:
+  ports:
+  - name: grpc-api
+    port: 8080
+    protocol: TCP
+  selector:
+    component: metadata-grpc-server
+  type: ClusterIP

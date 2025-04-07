@@ -1,0 +1,55 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-istio-admin
+  name: kubeflow-istio-admin
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-istio-admin'
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      rbac.authorization.kubeflow.org/aggregate-to-kubeflow-istio-admin: "true"
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-istio-edit
+  name: kubeflow-istio-edit
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-istio-admin: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-istio-edit'
+rules:
+- apiGroups:
+  - istio.io
+  - networking.istio.io
+  resources: ["*"]
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - deletecollection
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-istio-view
+  name: kubeflow-istio-view
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-view: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-istio-view'
+rules:
+- apiGroups:
+  - istio.io
+  - networking.istio.io
+  resources: ["*"]
+  verbs:
+  - get
+  - list
+  - watch

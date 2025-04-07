@@ -1,0 +1,9 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: cert-manager.io|Issuer|default|katib-selfsigned-issuer
+  name: katib-selfsigned-issuer
+  namespace: kubeflow
+spec:
+  selfSigned: {}

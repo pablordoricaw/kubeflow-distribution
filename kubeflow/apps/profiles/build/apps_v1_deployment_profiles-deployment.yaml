@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apps|Deployment|default|deployment
+  labels:
+    kustomize.component: profiles
+  name: profiles-deployment
+  namespace: kubeflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kustomize.component: profiles
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        kustomize.component: profiles
+    spec:
+      containers:
+      - command:
+        - /manager
+        - -userid-header
+        - $(USERID_HEADER)
+        - -userid-prefix
+        - $(USERID_PREFIX)
+        - -workload-identity
+        - $(WORKLOAD_IDENTITY)
+        env:
+        - name: USERID_HEADER
+          valueFrom:
+            configMapKeyRef:
+              key: userid-header
+              name: kubeflow-config
+        - name: USERID_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              key: userid-prefix
+              name: kubeflow-config
+        - name: WORKLOAD_IDENTITY
+          valueFrom:
+            configMapKeyRef:
+              key: gcp-sa
+              name: profiles-config-k9767826m9
+        envFrom:
+        - configMapRef:
+            name: profiles-config-k9767826m9
+        image: docker.io/kubeflownotebookswg/profile-controller:v1.8.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9876
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: manager
+        ports:
+        - containerPort: 9876
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 9876
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        volumeMounts:
+        - mountPath: /etc/profile-controller
+          name: namespace-labels
+          readOnly: true
+      - command:
+        - /access-management
+        - -cluster-admin
+        - $(ADMIN)
+        - -userid-header
+        - $(USERID_HEADER)
+        - -userid-prefix
+        - $(USERID_PREFIX)
+        env:
+        - name: ADMIN
+          valueFrom:
+            configMapKeyRef:
+              key: admin
+              name: profiles-config-k9767826m9
+        - name: USERID_HEADER
+          valueFrom:
+            configMapKeyRef:
+              key: userid-header
+              name: kubeflow-config
+        - name: USERID_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              key: userid-prefix
+              name: kubeflow-config
+        - name: WORKLOAD_IDENTITY
+          valueFrom:
+            configMapKeyRef:
+              key: gcp-sa
+              name: profiles-config-k9767826m9
+        envFrom:
+        - configMapRef:
+            name: profiles-config-k9767826m9
+        image: docker.io/kubeflownotebookswg/kfam:v1.8.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        name: kfam
+        ports:
+        - containerPort: 8081
+          name: kfam-http
+          protocol: TCP
+      serviceAccountName: profiles-controller-service-account
+      volumes:
+      - configMap:
+          name: namespace-labels-data-d9t4922m4c
+        name: namespace-labels

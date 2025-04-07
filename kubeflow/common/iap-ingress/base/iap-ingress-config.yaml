@@ -3,10 +3,10 @@ data:
   ingressName: envoy-ingress
   istioNamespace: istio-system
   oauthSecretName: kubeflow-oauth
-  appName: KUBEFLOW-NAME # kpt-set: ${name}
-  hostname: KUBEFLOW-NAME.endpoints.PROJECT.cloud.goog # kpt-set: ${name}.endpoints.${gcloud.core.project}.cloud.goog
-  ipName: KUBEFLOW-NAME-ip # kpt-set: ${name}-ip
-  project: "PROJECT" # kpt-set: ${gcloud.core.project}
+  appName: kubeflow # kpt-set: ${name}
+  hostname: kubeflow.endpoints.columbia-ms-courses-home.cloud.goog # kpt-set: ${name}.endpoints.${gcloud.core.project}.cloud.goog
+  ipName: kubeflow-ip # kpt-set: ${name}-ip
+  project: "columbia-ms-courses-home" # kpt-set: ${gcloud.core.project}
 kind: ConfigMap
 metadata:
   creationTimestamp: null

@@ -1,0 +1,10 @@
+apiVersion: kubeflow.org/v1beta1
+kind: Profile
+metadata: # kpt-merge: /$(profile-name)
+  name: $(profile-name)
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'kubeflow.org|Profile|default|$(profile-name)'
+spec:
+  owner:
+    kind: User
+    name: $(user)

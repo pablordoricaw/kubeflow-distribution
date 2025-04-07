@@ -1,0 +1,14 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: security.istio.io|AuthorizationPolicy|default|metadata-grpc-service
+  name: metadata-grpc-service
+  namespace: kubeflow
+spec:
+  action: ALLOW
+  rules:
+  - {}
+  selector:
+    matchLabels:
+      component: metadata-grpc-server

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata: # kpt-merge: /service
+  labels:
+    run: tensorboards-web-app
+  name: service
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|default|service'
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  type: ClusterIP

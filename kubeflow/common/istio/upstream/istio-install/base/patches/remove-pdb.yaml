@@ -1,0 +1,17 @@
+$patch: delete
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: # kpt-merge: istio-system/istio-ingressgateway
+  name: istio-ingressgateway
+  namespace: istio-system
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'policy|PodDisruptionBudget|istio-system|istio-ingressgateway'
+---
+$patch: delete
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: # kpt-merge: istio-system/istiod
+  name: istiod
+  namespace: istio-system
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'policy|PodDisruptionBudget|istio-system|istiod'

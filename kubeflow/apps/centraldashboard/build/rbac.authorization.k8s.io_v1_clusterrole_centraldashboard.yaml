@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: rbac.authorization.k8s.io|ClusterRole|default|centraldashboard
+  labels:
+    app: centraldashboard
+    app.kubernetes.io/component: centraldashboard
+    app.kubernetes.io/name: centraldashboard
+    kustomize.component: centraldashboard
+  name: centraldashboard
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - namespaces
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch

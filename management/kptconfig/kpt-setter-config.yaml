@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: kpt-setter-config
 data:
-  name: MANAGEMENT-NAME # kpt-set: ${name}
-  gcloud.core.project: PROJECT # kpt-set: ${gcloud.core.project}
-  location: LOCATION # kpt-set: ${location}
+  name: kubeflow-chef # kpt-set: ${name}
+  gcloud.core.project: columbia-ms-courses-home # kpt-set: ${gcloud.core.project}
+  location: us-east4 # kpt-set: ${location}

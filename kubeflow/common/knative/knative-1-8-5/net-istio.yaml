@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -29,7 +28,6 @@ rules:
   - apiGroups: ["networking.istio.io"]
     resources: ["virtualservices", "gateways", "destinationrules"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
-
 ---
 # Copyright 2019 The Knative Authors
 #
@@ -44,7 +42,6 @@ rules:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 # This is the shared Gateway for all Knative routes to use.
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -66,7 +63,6 @@ spec:
         protocol: HTTP
       hosts:
         - "*"
-
 ---
 # Copyright 2019 The Knative Authors
 #
@@ -81,7 +77,6 @@ spec:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 # A cluster local gateway to allow pods outside of the mesh to access
 # Services and Routes not exposing through an ingress.  If the users
 # do have a service mesh setup, this isn't required.
@@ -125,7 +120,6 @@ spec:
     - name: http2
       port: 80
       targetPort: 8081
-
 ---
 # Copyright 2018 The Knative Authors
 #
@@ -140,7 +134,6 @@ spec:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -196,7 +189,6 @@ data:
     # endpoint readiness. Otherwise, probe as usual.
     # NOTE: This feature is currently experimental and should not be used in production.
     enable-virtualservice-status: "false"
-
 ---
 # Allows the Webhooks to be reached by kube-api with or without
 # sidecar injection and with mTLS PERMISSIVE and STRICT.
@@ -253,7 +245,6 @@ spec:
   portLevelMtls:
     "8443":
       mode: PERMISSIVE
-
 ---
 # Copyright 2019 The Knative Authors
 #
@@ -268,7 +259,6 @@ spec:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -341,7 +331,6 @@ spec:
 
 # Unlike other controllers, this doesn't need a Service defined for metrics and
 # profiling because it opts out of the mesh (see annotation above).
-
 ---
 # Copyright 2020 The Knative Authors
 #
@@ -356,7 +345,6 @@ spec:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -425,7 +413,6 @@ spec:
               containerPort: 8008
             - name: https-webhook
               containerPort: 8443
-
 ---
 # Copyright 2020 The Knative Authors
 #
@@ -440,7 +427,6 @@ spec:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -451,7 +437,6 @@ metadata:
     app.kubernetes.io/name: knative-serving
     app.kubernetes.io/version: "1.8.3"
     networking.knative.dev/ingress-provider: istio
-
 ---
 # Copyright 2020 The Knative Authors
 #
@@ -466,7 +451,6 @@ metadata:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -492,7 +476,6 @@ spec:
       targetPort: 8443
   selector:
     app: net-istio-webhook
-
 ---
 # Copyright 2020 The Knative Authors
 #
@@ -507,7 +490,6 @@ spec:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -531,7 +513,6 @@ webhooks:
       matchExpressions:
         - {key: "serving.knative.dev/configuration", operator: Exists}
     name: webhook.istio.networking.internal.knative.dev
-
 ---
 # Copyright 2020 The Knative Authors
 #
@@ -546,7 +527,6 @@ webhooks:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
@@ -571,5 +551,3 @@ webhooks:
       matchLabels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/component: net-istio
-
----

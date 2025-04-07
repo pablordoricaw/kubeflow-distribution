@@ -1,0 +1,67 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /cluster-role
+  name: cluster-role
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|cluster-role'
+rules:
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - poddefaults
+  verbs:
+  - get
+  - watch
+  - list
+  - update
+  - create
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-poddefaults-admin
+  name: kubeflow-poddefaults-admin
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-poddefaults-admin'
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      rbac.authorization.kubeflow.org/aggregate-to-kubeflow-poddefaults-admin: "true"
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-poddefaults-edit
+  name: kubeflow-poddefaults-edit
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-poddefaults-edit'
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      rbac.authorization.kubeflow.org/aggregate-to-kubeflow-poddefaults-edit: "true"
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-poddefaults-view
+  name: kubeflow-poddefaults-view
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-poddefaults-admin: "true"
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-poddefaults-edit: "true"
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-view: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-poddefaults-view'
+rules:
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - poddefaults
+  verbs:
+  - get
+  - list
+  - watch

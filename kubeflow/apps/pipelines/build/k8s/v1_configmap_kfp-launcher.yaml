@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  defaultPipelineRoot: gs://columbia-ms-courses-home-kfp/v2/artifacts
+kind: ConfigMap
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|ConfigMap|default|kfp-launcher'
+  labels:
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+  name: kfp-launcher
+  namespace: kubeflow

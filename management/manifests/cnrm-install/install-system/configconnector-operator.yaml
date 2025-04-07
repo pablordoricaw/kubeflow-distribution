@@ -30,26 +30,20 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    - description: When 'true' the most recent reconcile of the ConfigConnectorContext
-        object succeeded
+    - description: When 'true' the most recent reconcile of the ConfigConnectorContext object succeeded
       jsonPath: .status.healthy
       name: Healthy
       type: string
     name: v1beta1
     schema:
       openAPIV3Schema:
-        description: ConfigConnectorContext is the Schema for the ConfigConnectorContexts
-          API
+        description: ConfigConnectorContext is the Schema for the ConfigConnectorContexts API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
@@ -57,23 +51,13 @@ spec:
             description: ConfigConnectorContextSpec defines the desired state of ConfigConnectorContext
             properties:
               billingProject:
-                description: Specifies the project to use for preconditions, quota
-                  and billing. Should only be used when requestProjectPolicy is set
-                  to BILLING_PROJECT.
+                description: Specifies the project to use for preconditions, quota and billing. Should only be used when requestProjectPolicy is set to BILLING_PROJECT.
                 type: string
               googleServiceAccount:
-                description: The Google Service Account to be used by Config Connector
-                  to authenticate with Google Cloud APIs in the associated namespace.
+                description: The Google Service Account to be used by Config Connector to authenticate with Google Cloud APIs in the associated namespace.
                 type: string
               requestProjectPolicy:
-                description: Specifies which project to use for preconditions, quota,
-                  and billing for requests made to Google Cloud APIs for resources
-                  in the associated namespace. Must be one of 'SERVICE_ACCOUNT_PROJECT',
-                  'RESOURCE_PROJECT', or 'BILLING_PROJECT. Defaults to 'SERVICE_ACCOUNT_PROJECT'.
-                  If set to 'SERVICE_ACCOUNT_PROJECT', uses the project that the Google
-                  Service Account belongs to. If set to 'RESOURCE_PROJECT', uses the
-                  project that the resource belongs to. If set to 'BILLING_PROJECT',
-                  uses the project specified by spec.billingProject.
+                description: Specifies which project to use for preconditions, quota, and billing for requests made to Google Cloud APIs for resources in the associated namespace. Must be one of 'SERVICE_ACCOUNT_PROJECT', 'RESOURCE_PROJECT', or 'BILLING_PROJECT. Defaults to 'SERVICE_ACCOUNT_PROJECT'. If set to 'SERVICE_ACCOUNT_PROJECT', uses the project that the Google Service Account belongs to. If set to 'RESOURCE_PROJECT', uses the project that the resource belongs to. If set to 'BILLING_PROJECT', uses the project specified by spec.billingProject.
                 enum:
                 - SERVICE_ACCOUNT_PROJECT
                 - RESOURCE_PROJECT
@@ -83,8 +67,7 @@ spec:
             - googleServiceAccount
             type: object
           status:
-            description: ConfigConnectorContextStatus defines the observed state of
-              ConfigConnectorContext
+            description: ConfigConnectorContextStatus defines the observed state of ConfigConnectorContext
             properties:
               errors:
                 items:
@@ -134,8 +117,7 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    - description: When 'true' the most recent reconcile of the ConfigConnector object
-        succeeded
+    - description: When 'true' the most recent reconcile of the ConfigConnector object succeeded
       jsonPath: .status.healthy
       name: Healthy
       type: string
@@ -145,14 +127,10 @@ spec:
         description: ConfigConnector is the Schema for the configconnectors API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
@@ -186,37 +164,13 @@ spec:
             description: ConfigConnectorSpec defines the desired state of ConfigConnector
             properties:
               credentialSecretName:
-                description: The Kubernetes secret that contains the Google Service
-                  Account Key's credentials to be used by ConfigConnector to authenticate
-                  with Google Cloud APIs. This field is used only when in cluster
-                  mode. It's recommended to use `googleServiceAccount` when running
-                  ConfigConnector in Google Kubernetes Engine (GKE) clusters with
-                  Workload Identity enabled. This field cannot be specified together
-                  with `googleServiceAccount`.
+                description: The Kubernetes secret that contains the Google Service Account Key's credentials to be used by ConfigConnector to authenticate with Google Cloud APIs. This field is used only when in cluster mode. It's recommended to use `googleServiceAccount` when running ConfigConnector in Google Kubernetes Engine (GKE) clusters with Workload Identity enabled. This field cannot be specified together with `googleServiceAccount`.
                 type: string
               googleServiceAccount:
-                description: The Google Service Account to be used by Config Connector
-                  to authenticate with Google Cloud APIs. This field is used only
-                  when running in cluster mode with Workload Identity enabled. See
-                  Google Kubernetes Engine (GKE) workload-identity (https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity)
-                  for details. This field cannot be specified together with `credentialSecretName`.
-                  For namespaced mode, use `googleServiceAccount` in ConfigConnectorContext
-                  CRD to specify the Google Service Account to be used to authenticate
-                  with Google Cloud APIs per namespace.
+                description: The Google Service Account to be used by Config Connector to authenticate with Google Cloud APIs. This field is used only when running in cluster mode with Workload Identity enabled. See Google Kubernetes Engine (GKE) workload-identity (https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) for details. This field cannot be specified together with `credentialSecretName`. For namespaced mode, use `googleServiceAccount` in ConfigConnectorContext CRD to specify the Google Service Account to be used to authenticate with Google Cloud APIs per namespace.
                 type: string
               mode:
-                description: The mode that Config Connector will run in. This can
-                  be either 'cluster' or 'namespaced'. The default is 'namespaced'.
-                  Cluster mode uses a single Google Service Account to create and
-                  manage resources, even if you are using Config Connector to manage
-                  multiple Projects. You must specify either `credentialSecretName`
-                  or `googleServiceAccount` when in cluster mode, but not both. Namespaced
-                  mode allows you to use different Google service accounts for different
-                  Projects. When in namespaced mode, you must create a ConfigConnectorContext
-                  object per namespace that you want to enable Config Connector in,
-                  and each must set `googleServiceAccount` to specify the Google Service
-                  Account to be used to authenticate with Google Cloud APIs for the
-                  namespace.
+                description: The mode that Config Connector will run in. This can be either 'cluster' or 'namespaced'. The default is 'namespaced'. Cluster mode uses a single Google Service Account to create and manage resources, even if you are using Config Connector to manage multiple Projects. You must specify either `credentialSecretName` or `googleServiceAccount` when in cluster mode, but not both. Namespaced mode allows you to use different Google service accounts for different Projects. When in namespaced mode, you must create a ConfigConnectorContext object per namespace that you want to enable Config Connector in, and each must set `googleServiceAccount` to specify the Google Service Account to be used to authenticate with Google Cloud APIs for the namespace.
                 enum:
                 - cluster
                 - namespaced

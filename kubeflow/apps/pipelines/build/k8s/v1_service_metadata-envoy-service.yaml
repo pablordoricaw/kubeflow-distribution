@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|default|metadata-envoy-service'
+  labels:
+    app: metadata-envoy
+  name: metadata-envoy-service
+  namespace: kubeflow
+spec:
+  ports:
+  - name: md-envoy
+    port: 9090
+    protocol: TCP
+  selector:
+    component: metadata-envoy
+  type: ClusterIP

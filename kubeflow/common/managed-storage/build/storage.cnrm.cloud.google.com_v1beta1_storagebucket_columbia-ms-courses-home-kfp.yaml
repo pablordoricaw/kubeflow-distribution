@@ -1,0 +1,12 @@
+apiVersion: storage.cnrm.cloud.google.com/v1beta1
+kind: StorageBucket
+metadata:
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "true"
+  labels:
+    app: managed-storage
+    kf-name: kubeflow
+  name: columbia-ms-courses-home-kfp
+  namespace: columbia-ms-courses-home
+spec:
+  location: us-east4

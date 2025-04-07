@@ -1,0 +1,86 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-training-admin
+  name: kubeflow-training-admin
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-training-admin'
+aggregationRule:
+  clusterRoleSelectors:
+    - matchLabels:
+        rbac.authorization.kubeflow.org/aggregate-to-kubeflow-training-admin: "true"
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-training-edit
+  name: kubeflow-training-edit
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-training-admin: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-training-edit'
+rules:
+  - apiGroups:
+      - kubeflow.org
+    resources:
+      - mpijobs
+      - tfjobs
+      - pytorchjobs
+      - mxjobs
+      - xgboostjobs
+      - paddlejobs
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - kubeflow.org
+    resources:
+      - mpijobs/status
+      - tfjobs/status
+      - pytorchjobs/status
+      - mxjobs/status
+      - xgboostjobs/status
+      - paddlejobs/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kubeflow-training-view
+  name: kubeflow-training-view
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-view: "true"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kubeflow-training-view'
+rules:
+  - apiGroups:
+      - kubeflow.org
+    resources:
+      - mpijobs
+      - tfjobs
+      - pytorchjobs
+      - mxjobs
+      - xgboostjobs
+      - paddlejobs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - kubeflow.org
+    resources:
+      - mpijobs/status
+      - tfjobs/status
+      - pytorchjobs/status
+      - mxjobs/status
+      - xgboostjobs/status
+      - paddlejobs/status
+    verbs:
+      - get
