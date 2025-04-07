@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|PersistentVolumeClaim|kubeflow|katib-mysql'
+  name: katib-mysql
+  namespace: kubeflow
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

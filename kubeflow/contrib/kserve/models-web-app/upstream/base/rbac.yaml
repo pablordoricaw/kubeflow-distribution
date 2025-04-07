@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata: # kpt-merge: kserve/kserve-models-web-app
+  name: kserve-models-web-app
+  namespace: kserve
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|ServiceAccount|kserve|kserve-models-web-app'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: # kpt-merge: /kserve-models-web-app-cluster-role
+  name: kserve-models-web-app-cluster-role
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|kserve-models-web-app-cluster-role'
+rules:
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - pods
+  - pods/log
+  - events
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - serving.kserve.io
+  resources:
+  - inferenceservices
+  - inferenceservices/status
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - deletecollection
+  - patch
+  - update
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - services
+  - services/status
+  - routes
+  - routes/status
+  - configurations
+  - configurations/status
+  - revisions
+  - revisions/status
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: # kpt-merge: /kserve-models-web-app-binding
+  name: kserve-models-web-app-binding
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRoleBinding|default|kserve-models-web-app-binding'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kserve-models-web-app-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: kserve-models-web-app
+  namespace: kserve

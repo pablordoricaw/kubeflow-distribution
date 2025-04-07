@@ -1,0 +1,16 @@
+apiVersion: sql.cnrm.cloud.google.com/v1beta1
+kind: SQLInstance
+metadata:
+  labels:
+    app: managed-storage
+    kf-name: kubeflow
+  name: kubeflow-kfp
+  namespace: columbia-ms-courses-home
+spec:
+  databaseVersion: MYSQL_8_0
+  region: us-east4
+  settings:
+    availabilityType: ZONAL
+    locationPreference:
+      zone: us-east4-a
+    tier: db-custom-1-3840

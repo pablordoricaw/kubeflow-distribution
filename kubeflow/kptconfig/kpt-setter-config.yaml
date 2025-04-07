@@ -3,16 +3,15 @@ kind: ConfigMap
 metadata:
   name: kpt-setter-config
 data:
-  mgmt-ctxt: MGMT_NAME # kpt-set: ${mgmt-ctxt}
-  name: KF_NAME # kpt-set: ${name}
-  gcloud.core.project: KF_PROJECT # kpt-set: ${gcloud.core.project}
-  gcloud.project.projectNumber: KF_PROJECT_NUMBER # kpt-set: ${gcloud.project.projectNumber}
-  location: LOCATION # kpt-set: ${location}
-  gcloud.compute.zone: ZONE # kpt-set: ${gcloud.compute.zone}
-  gcloud.compute.region: REGION # kpt-set: ${gcloud.compute.region}
-  email: ADMIN_EMAIL # kpt-set: ${email}
-  asm-label: ASM_LABEL # kpt-set: ${asm-label}
-  cloudsql-name: CLOUDSQL_NAME # kpt-set: ${cloudsql-name}
-  bucket-name: BUCKET_NAME # kpt-set: ${bucket-name}
-  default-pipeline-root: DEFAULT_PIPELINE_ROOT # kpt-set: ${default-pipeline-root}
-
+  mgmt-ctxt: kubeflow-chef # kpt-set: ${mgmt-ctxt}
+  name: kubeflow # kpt-set: ${name}
+  gcloud.core.project: columbia-ms-courses-home # kpt-set: ${gcloud.core.project}
+  gcloud.project.projectNumber: 986135780733 # kpt-set: ${gcloud.project.projectNumber}
+  location: us-east4-a # kpt-set: ${location}
+  gcloud.compute.zone: us-east4-a # kpt-set: ${gcloud.compute.zone}
+  gcloud.compute.region: us-east4 # kpt-set: ${gcloud.compute.region}
+  email: pablo.ordoricaw@gmail.com # kpt-set: ${email}
+  asm-label: asm-1162-2 # kpt-set: ${asm-label}
+  cloudsql-name: kubeflow-kfp # kpt-set: ${cloudsql-name}
+  bucket-name: columbia-ms-courses-home-kfp # kpt-set: ${bucket-name}
+  default-pipeline-root: gs://columbia-ms-courses-home-kfp/v2/artifacts # kpt-set: ${default-pipeline-root}

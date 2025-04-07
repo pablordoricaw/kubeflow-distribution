@@ -1,0 +1,6 @@
+- op: add
+  path: /rules/-
+  value:
+    apiGroups: [authorization.k8s.io]
+    resources: [subjectaccessreviews]
+    verbs: [create]

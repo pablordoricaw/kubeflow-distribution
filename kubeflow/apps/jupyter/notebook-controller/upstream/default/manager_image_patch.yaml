@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: # kpt-merge: system/controller-manager
+  name: controller-manager
+  namespace: system
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'apps|Deployment|system|controller-manager'
+spec:
+  template:
+    spec:
+      containers:
+      # Change the value of image field below to your controller image URL
+      - image: IMAGE_URL
+        name: manager

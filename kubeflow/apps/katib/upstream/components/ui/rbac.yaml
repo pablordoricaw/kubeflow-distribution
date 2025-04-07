@@ -1,0 +1,57 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata: # kpt-merge: /katib-ui
+  name: katib-ui
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRole|default|katib-ui'
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - namespaces
+    verbs:
+      - "*"
+  - apiGroups:
+      - kubeflow.org
+    resources:
+      - experiments
+      - trials
+      - suggestions
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - pods/log
+    verbs:
+      - get
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata: # kpt-merge: kubeflow/katib-ui
+  name: katib-ui
+  namespace: kubeflow
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|ServiceAccount|kubeflow|katib-ui'
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata: # kpt-merge: /katib-ui
+  name: katib-ui
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'rbac.authorization.k8s.io|ClusterRoleBinding|default|katib-ui'
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: katib-ui
+subjects:
+  - kind: ServiceAccount
+    name: katib-ui
+    namespace: kubeflow

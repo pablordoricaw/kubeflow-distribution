@@ -1,0 +1,8 @@
+$patch: delete
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: # kpt-merge: istio-system/cluster-local-gateway
+  name: cluster-local-gateway
+  namespace: istio-system
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'policy|PodDisruptionBudget|istio-system|cluster-local-gateway'

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata: # kpt-merge: kserve/kserve-models-web-app
+  name: kserve-models-web-app
+  namespace: kserve
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|Service|kserve|kserve-models-web-app'
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app.kubernetes.io/component: kserve-models-web-app
+  type: ClusterIP

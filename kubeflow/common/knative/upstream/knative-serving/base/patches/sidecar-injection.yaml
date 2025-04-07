@@ -1,0 +1,12 @@
+patches:
+apiVersion: apps/v1
+kind: Deployment
+metadata: # kpt-merge: /*
+  name: "*"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'apps|Deployment|default|*'
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"

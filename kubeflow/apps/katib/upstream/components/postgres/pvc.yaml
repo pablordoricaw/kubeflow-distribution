@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: # kpt-merge: kubeflow/katib-postgres
+  name: katib-postgres
+  namespace: kubeflow
+  annotations:
+    internal.kpt.dev/upstream-identifier: '|PersistentVolumeClaim|kubeflow|katib-postgres'
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi

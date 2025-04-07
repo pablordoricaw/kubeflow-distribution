@@ -1,0 +1,16 @@
+# Allow all traffic to the cluster-local-gateway
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata: # kpt-merge: /cluster-local-gateway
+  name: cluster-local-gateway
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'security.istio.io|AuthorizationPolicy|default|cluster-local-gateway'
+spec:
+  action: ALLOW
+  selector:
+    # Same as the cluster-local-gateway Service selector
+    matchLabels:
+      app: cluster-local-gateway
+      istio: cluster-local-gateway
+  rules:
+  - {}

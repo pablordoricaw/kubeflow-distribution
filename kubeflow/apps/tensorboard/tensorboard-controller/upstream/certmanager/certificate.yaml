@@ -1,0 +1,28 @@
+# The following manifests contain a self-signed issuer CR and a certificate CR.
+# More document can be found at https://docs.cert-manager.io
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata: # kpt-merge: system/selfsigned-issuer
+  name: selfsigned-issuer
+  namespace: system
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'certmanager.k8s.io|Issuer|system|selfsigned-issuer'
+spec:
+  selfSigned: {}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata: # kpt-merge: system/serving-cert
+  name: serving-cert # this name should match the one appeared in kustomizeconfig.yaml
+  namespace: system
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'certmanager.k8s.io|Certificate|system|serving-cert'
+spec:
+  # $(SERVICE_NAME) and $(SERVICE_NAMESPACE) will be substituted by kustomize
+  commonName: $(SERVICE_NAME).$(SERVICE_NAMESPACE).svc
+  dnsNames:
+  - $(SERVICE_NAME).$(SERVICE_NAMESPACE).svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: selfsigned-issuer
+  secretName: webhook-server-cert # this secret will not be prefixed, since it's not managed by kustomize

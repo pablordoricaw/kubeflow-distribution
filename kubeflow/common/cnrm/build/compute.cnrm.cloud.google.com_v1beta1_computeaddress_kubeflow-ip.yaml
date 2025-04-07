@@ -1,0 +1,13 @@
+apiVersion: compute.cnrm.cloud.google.com/v1beta1
+kind: ComputeAddress
+metadata:
+  labels:
+    kf-name: kubeflow
+    label-one: value-one
+  name: kubeflow-ip
+  namespace: columbia-ms-courses-home
+spec:
+  addressType: EXTERNAL
+  description: Static IP for Kubeflow ingress.
+  ipVersion: IPV4
+  location: global

@@ -1,0 +1,15 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata: # kpt-merge: /katib.kubeflow.org
+  name: katib.kubeflow.org
+  annotations:
+    cert-manager.io/inject-ca-from: $(KATIB_NAMESPACE)/$(KATIB_CERT_NAME)
+    internal.kpt.dev/upstream-identifier: 'admissionregistration.k8s.io|ValidatingWebhookConfiguration|default|katib.kubeflow.org'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata: # kpt-merge: /katib.kubeflow.org
+  name: katib.kubeflow.org
+  annotations:
+    cert-manager.io/inject-ca-from: $(KATIB_NAMESPACE)/$(KATIB_CERT_NAME)
+    internal.kpt.dev/upstream-identifier: 'admissionregistration.k8s.io|MutatingWebhookConfiguration|default|katib.kubeflow.org'

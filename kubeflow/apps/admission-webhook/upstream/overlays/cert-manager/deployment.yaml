@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: # kpt-merge: /deployment
+  name: deployment
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'apps|Deployment|default|deployment'
+spec:
+  template:
+    spec:
+      containers:
+      - name: admission-webhook
+        args:
+        - --tlsCertFile=/etc/webhook/certs/tls.crt
+        - --tlsKeyFile=/etc/webhook/certs/tls.key

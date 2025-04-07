@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: # kpt-merge: /katib-ui
+  name: "katib-ui"
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'apps|Deployment|default|katib-ui'
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"

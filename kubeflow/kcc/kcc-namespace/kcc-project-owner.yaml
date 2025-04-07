@@ -15,17 +15,17 @@
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
 kind: IAMPartialPolicy
 metadata:
-  name: kcc-project-id-owners-permissions # kpt-set: kcc-${project-id}-owners-permissions
-  namespace: projects # kpt-set: ${projects-namespace}
+  name: kcc-columbia-ms-courses-home-owners-permissions # kpt-set: kcc-${project-id}-owners-permissions
+  namespace: config-control # kpt-set: ${projects-namespace}
   annotations:
     cnrm.cloud.google.com/blueprint: cnrm/kcc-namespace/v0.4.2
-    cnrm.cloud.google.com/project-id: management-project-id # kpt-set: ${management-project-id}
+    cnrm.cloud.google.com/project-id: columbia-ms-courses-home # kpt-set: ${management-project-id}
 spec:
   resourceRef:
     apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
     kind: Project
-    external: project-id # kpt-set: ${project-id}
+    external: columbia-ms-courses-home # kpt-set: ${project-id}
   bindings:
     - role: roles/owner
       members:
-        - member: serviceAccount:kcc-project-id@management-project-id.iam.gserviceaccount.com # kpt-set: serviceAccount:kcc-${project-id}@${management-project-id}.iam.gserviceaccount.com
+        - member: serviceAccount:kcc-columbia-ms-courses-home@columbia-ms-courses-home.iam.gserviceaccount.com # kpt-set: serviceAccount:kcc-${project-id}@${management-project-id}.iam.gserviceaccount.com

@@ -1,0 +1,14 @@
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMPolicyMember
+metadata:
+  labels:
+    kf-name: kubeflow
+  name: kubeflow-user-workload-identity-user-pipeline-runner
+  namespace: columbia-ms-courses-home
+spec:
+  member: serviceAccount:columbia-ms-courses-home.svc.id.goog[kubeflow/pipeline-runner]
+  resourceRef:
+    apiVersion: iam.cnrm.cloud.google.com/v1beta1
+    kind: IAMServiceAccount
+    name: kubeflow-user
+  role: roles/iam.workloadIdentityUser

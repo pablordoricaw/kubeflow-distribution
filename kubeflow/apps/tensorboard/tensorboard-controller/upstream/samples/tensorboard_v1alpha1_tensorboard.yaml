@@ -1,0 +1,10 @@
+apiVersion: tensorboard.kubeflow.org/v1alpha1
+kind: Tensorboard
+metadata: # kpt-merge: kubeflow/tensorboard-sample1
+  name: tensorboard-sample1
+  namespace: kubeflow
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'tensorboard.kubeflow.org|Tensorboard|kubeflow|tensorboard-sample1'
+spec:
+  # Add fields here
+  logspath: "gs://quanlinkubeflow1_tf_mnist_logs1/mnist_tutorial/"

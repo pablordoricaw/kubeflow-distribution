@@ -1,0 +1,23 @@
+apiVersion: v1
+data:
+  namespace-labels.yaml: "# Below is a list of labels to be set by default.\n#\n#
+    To add a namespace label, use `key: 'value'`, for example:\n# istio.io/rev: 'asm-191-1'\n#\n#
+    To remove a namespace label, use `key: ''` to remove key, for example:\n# istio-injection:
+    ''\n# \n# Profile controller will not replace value if namespace label already
+    exists.\n# But profile controller keeps removing namespace label if removing is
+    specified here.\n# In order to change this enforcement:\n# 1. If your profile
+    already has this label:\n#       First, remove this label by using `key: ''` and
+    deploy.\n#       Second, add this label by using `key: 'value'` and deploy.\n#
+    2. If your profile doesn't have this label:\n#       you can add label and value
+    to this file and deploy.\n# Reason:\n#    Profile controller will enforce flag
+    removal, but not enforce value replacement.\n#   \nkatib-metricscollector-injection:
+    'enabled'\nkatib.kubeflow.org/metrics-collector-injection: 'enabled'\nserving.kubeflow.org/inferenceservice:
+    'enabled'\npipelines.kubeflow.org/enabled: 'true'\napp.kubernetes.io/part-of:
+    'kubeflow-profile'\n# Below is a list of labels to be enforced.\nistio-injection:
+    ''\nistio.io/rev: asm-1104-6 # kpt-set: ${asm-label}\n"
+kind: ConfigMap
+metadata:
+  labels:
+    kustomize.component: profiles
+  name: namespace-labels-data-d9t4922m4c
+  namespace: kubeflow

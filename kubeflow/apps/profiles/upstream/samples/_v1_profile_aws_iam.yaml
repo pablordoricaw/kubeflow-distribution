@@ -1,0 +1,14 @@
+apiVersion: kubeflow.org/v1
+kind: Profile
+metadata: # kpt-merge: /profile-aws-iam
+  name: profile-aws-iam
+  annotations:
+    internal.kpt.dev/upstream-identifier: 'kubeflow.org|Profile|default|profile-aws-iam'
+spec:
+  owner:
+    kind: User
+    name: test-user@kubeflow.org
+  plugins:
+  - kind: AwsIamForServiceAccount
+    spec:
+      awsIamRole: arn:aws:iam::account-id:role/s3-reader

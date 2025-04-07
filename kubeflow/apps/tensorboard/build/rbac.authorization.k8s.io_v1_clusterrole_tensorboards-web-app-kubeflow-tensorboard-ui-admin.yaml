@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: rbac.authorization.k8s.io|ClusterRole|default|kubeflow-tensorboard-ui-admin
+  labels:
+    app: tensorboards-web-app
+    kustomize.component: tensorboards-web-app
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
+  name: tensorboards-web-app-kubeflow-tensorboard-ui-admin
+rules: []
